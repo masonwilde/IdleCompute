@@ -19,7 +19,7 @@ button.paused {
   background-color: red;
 }
 
-button.running {
+button.playing {
   background-color: green;
 }
 
