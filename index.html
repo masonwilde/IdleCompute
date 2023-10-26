@@ -2,7 +2,8 @@
 <html>
   <head>
     <title>Idle Compute</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles.css" />
+    <script src="main.js"></script>
     <meta charset="UTF-8" />
     <meta
       name="description"
@@ -10,14 +11,26 @@
     />
     <meta name="author" content="masonwilde" />
   </head>
-  <body>
+  <body onload="startup()">
     <header>
-      <h1>Idle Compute</h1>
+      <h1>Idle Compute <button onclick="reset()">Reset</button></h1>
     </header>
-    <div name="idle_compute_main">
-      <p>game placeholder</p>
+    <div class="game-panel">
+      <div id="system-ui" class="center-all">
+        <button id="save-button" onclick="save()">save</button>
+        <button id="load-button" onclick="load()">load</button>
+        <button id="pause-button" onclick="pause()">pause</button>
+        <button id="run-button" onclick="run()">run</button>
+      </div>
+      <div id="notifications" class="flex-vert-auto"></div>
+      <div id="count" class="flex-vert-auto" style="display:inline;">
+        <span id="count-unit">Units:</span>
+        <span id="count-value">0</span>
+      </div>
+      <div id="buyables" class="flex-vert-auto"></div>
+      <div id="operations" class="flex-vert-filler center-all">test</div>
     </div>
-    <footer>
+    <footer class="center-all">
       <p>Author: Mason Wilde</p>
       <p>
         <a href="https://github.com/masonwilde/IdleCompute"
