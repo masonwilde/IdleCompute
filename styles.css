@@ -1,7 +1,8 @@
 body {
-  min-height: 100vh;
+  height: 100vh;
   display: flex;
   flex-direction: column;
+  margin: 0px 8px;
   background-color: gray;
   overflow: hidden;
 }
@@ -15,18 +16,14 @@ button {
   min-width: 15mm;
 }
 
-button.paused {
+button.playpause {
   background-color: red;
 }
-
-button.playing {
+button.playpause.running {
   background-color: green;
 }
 
 .game-panel {
-  flex: 1 1 auto;
-  display: flex;
-  flex-direction: column;
   /* align-items: center;
   justify-content: center; */
   background-color: lightgray;

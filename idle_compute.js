@@ -117,17 +117,8 @@ const START_STATE = {
 // state s truly initialized in initialize().
 var s = JSON.parse(JSON.stringify(START_STATE));
 
-var capabilities = {
-  magnitude: 1,
-  bits: 1,
-  dimensions: 2,
-}
-
-var running = false;
-var debug = true;
-
 function dlog(message) {
-  if (debug) {
+  if (s.debug) {
     console.log(message);
   }
 }
@@ -152,8 +143,8 @@ function getRandomNumber() {
 
 const KNOWLEDGE = {
   notepad: {
-    unlocked: ()=>s.knowledge.notepad.unlocked,
-    requirement:()=>true,
+    unlocked: ()=>{return s.knowledge.notepad.unlocked},
+    requirement:()=>{return true},
     domains: {
       arithmetic: {
         unlocked: ()=>s.notepad.domains.arithmetic.unlocked,
@@ -161,9 +152,9 @@ const KNOWLEDGE = {
         operations: {
           increment: {
             name: "increment",
-            level: s.notepad.domains.arithmetic.operations.increment.level,
+            level: ()=>s.notepad.domains.arithmetic.operations.increment.level,
             strength: 0,
-            curve() {return (this.level * 10**this.strength)},
+            curve() {return (this.level() * 2**this.strength)},
             op() {
               logit("Incrementing: 1 + " + getRandomNumber())
               s.calculations += this.curve();
@@ -174,70 +165,75 @@ const KNOWLEDGE = {
             name: "add",
             level: ()=>s.notepad.domains.arithmetic.operations.add.level,
             strength: 1,
-            
-            curve() {return (this.level * 10^this.strength)},
+            curve() {return (this.level() * 2**this.strength)},
             op() {
-              log("Adding: " + getRandomNumber() + " + " + getRandomNumber());
+              logit("Adding: " + getRandomNumber() + " + " + getRandomNumber());
+              dlog("Adding: " + this.curve())
               s.calculations += this.curve();
               s.cycles += this.curve();
             },
           },
           multiply: {
             name: "multiply",
-            level: s.notepad.domains.arithmetic.operations.multiply.level,
+            level: ()=>s.notepad.domains.arithmetic.operations.multiply.level,
             strength: 2,
             curve: function() {
-              return this.level * 10^this.strength;
+              return this.level() * 2**this.strength;
             },
             op: function() {
+              logit("Multiplying: " + getRandomNumber() + " * " + getRandomNumber());
               s.calculations += this.curve();
               s.cycles += this.curve();
             },
           },
           exponentiate: {
             name: "exponentiate",
-            level: s.notepad.domains.arithmetic.operations.exponentiate.level,
+            level: ()=>s.notepad.domains.arithmetic.operations.exponentiate.level,
             strength: 3,
             curve: function() {
-              return this.level * 10^this.strength;
+              return this.level() * 2**this.strength;
             },
             op: function() {
+              logit("Exponentiating: " + getRandomNumber() + "<sup>" + getRandomNumber() + "</sup>");
               s.calculations += this.curve();
               s.cycles += this.curve();
             },
           },
           tetrate: {
             name: "tetrate",
-            level: s.notepad.domains.arithmetic.operations.tetrate.level,
+            level: ()=>s.notepad.domains.arithmetic.operations.tetrate.level,
             strength: 4,
             curve: function() {
-              return this.level * 10^this.strength;
+              return this.level() * 2**this.strength;
             },
             op: function() {
+              logit("Tetrating: <sup>" + getRandomNumber() + "</sup>" + getRandomNumber());
               s.calculations += this.curve();
               s.cycles += this.curve();
             },
           },
           pentate: {
             name: "pentate",
-            level: s.notepad.domains.arithmetic.operations.pentate.level,
+            level: ()=>s.notepad.domains.arithmetic.operations.pentate.level,
             strength: 5,
             curve: function() {
-              return this.level * 10^this.strength;
+              return this.level() * 2**this.strength;
             },
             op: function() {
+              logit("Pentating: " + getRandomNumber() + "[5]" + getRandomNumber());
               s.calculations += this.curve();
               s.cycles += this.curve();
             },
           },
           hexate: {
             name: "hexate",
-            level: s.notepad.domains.arithmetic.operations.hexate.level,
+            level: ()=>s.notepad.domains.arithmetic.operations.hexate.level,
             strength: 6,
             curve: function() {
-              return this.level * 10^this.strength;
+              return this.level() * 10^this.strength;
             },
             op: function() {
+              logit("Hexating: " + getRandomNumber() + "[6]" + getRandomNumber());
               s.calculations += this.curve();
               s.cycles += this.curve();
             },
@@ -294,12 +290,58 @@ var upgrades = {};
 var completedBreakpoints = [];
 
 var breakpoints = [
+  // Unlock arithmetic add.
   [
     function () {
-      return count >= 10;
+      return s.calculations >= 2**4;
     },
     () => {
-      enableOperation("multiply");
+      enableOperation("notepad", "arithmetic", "add");
+    },
+  ],
+  // Unlock arithmetic multiply.
+  [
+    function () {
+      return s.calculations >= 2**6;
+    },
+    () => {
+      enableOperation("notepad", "arithmetic", "multiply");
+    },
+  ],
+  // Unlock arithmetic exponentiate.
+  [
+    function () {
+      return s.calculations >= 2**8;
+    },
+    () => {
+      enableOperation("notepad", "arithmetic", "exponentiate");
+    },
+  ],
+  // Unlock arithmetic tetrate.
+  [
+    function () {
+      return s.calculations >= 2**10;
+    },
+    () => {
+      enableOperation("notepad", "arithmetic", "tetrate");
+    },
+  ],
+  // Unlock arithmetic pentate.
+  [
+    function () {
+      return s.calculations >= 2**12;
+    },
+    () => {
+      enableOperation("notepad", "arithmetic", "pentate");
+    },
+  ],
+  // Unlock arithmetic hexate.
+  [
+    function () {
+      return s.calculations >= 2**14;
+    },
+    () => {
+      enableOperation("notepad", "arithmetic", "hexate");
     },
   ],
 ];
@@ -309,7 +351,7 @@ var log = [];
 
 function initNotepadArithmeticUi() {
   arith = document.getElementById("notepadepad-arithmetic");
-  if (KNOWLEDGE.notepad.domains.arithmetic.operations.increment.level > 0) {
+  if (KNOWLEDGE.notepad.domains.arithmetic.operations.increment.level() > 0) {
     enableOperationButton("notepad", "arithmetic", "increment");
   }
 }
@@ -356,7 +398,9 @@ function initialize() {
 }
 
 function updateCountUi() {
-  document.getElementById("count-value").innerHTML =
+  document.getElementById("calculations-val").innerHTML =
+    String(s.calculations);
+    document.getElementById("cycles-val").innerHTML =
     String(s.calculations);
 }
 
@@ -386,7 +430,7 @@ function updateUi() {
 }
 
 function updateSimulation() {
-  if (!running) return;
+  if (!s.running) return;
   checkBreakpoints();
 }
 
@@ -421,8 +465,9 @@ function enableOperationButton(workspace, domain, operation) {
 
 function enableOperation(workspace, domain, operation) {
   dlog("Adding operation: " + KNOWLEDGE[workspace].domains[domain].operations[operation].name);
-  if (s[workspace][domain].operations[operation].level == 0) {
-    s[workspace][domain].operations[operation].level = 1;
+  if (s[workspace].domains[domain].operations[operation].level == 0) {
+    dlog("setting level to 1 for: " + operation);
+    s[workspace].domains[domain].operations[operation].level = 1;
   }
   enableOperationButton(workspace, domain, operation);
 }
@@ -435,20 +480,11 @@ function load() {
   // TODO: implement load
 }
 
-function pause() {
-  if (!running) return;
-  dlog("paused");
-  running = false;
-  document.getElementById("pause-button").classList.add("paused");
-  document.getElementById("play-button").classList.remove("playing");
-}
-
-function play() {
-  if (running) return;
-  dlog("play");
-  running = true;
-  document.getElementById("pause-button").classList.remove("paused");
-  document.getElementById("play-button").classList.add("playing");
+function togglePlay() {
+  s.running = !s.running;
+  but = document.getElementById("playpause-button")
+  but.classList.toggle("running");
+  but.innerHTML = s.running ? "Running" : "Paused";
 }
 
 function startup() {
@@ -458,7 +494,7 @@ function startup() {
 }
 
 function run() {
-  play();
+  togglePlay();
   setInterval(updateUi, UI_INTERVAL);
   setInterval(updateSimulation, SIM_INTERVAL);
 }
