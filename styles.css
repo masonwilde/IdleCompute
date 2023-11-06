@@ -14,6 +14,8 @@ footer {
 button {
   min-height: 10mm;
   min-width: 15mm;
+  margin: 2px;
+  z-index: 10;
 }
 
 button.playpause {
@@ -60,4 +62,11 @@ button.playpause.running {
   align-items: center;
   justify-content: center;
   text-align: center;
+}
+
+p.scribble {
+  font-family: 'Bradley Hand', cursive;
+  font-size: 2em;
+  position: absolute;
+  z-index: 1;
 }
