@@ -348,19 +348,32 @@ function initNotepadTab() {
   button_to_add.innerHTML = "COMPUTE";
   button_to_add.addEventListener("click", function () {compute()});
   button_to_add.id = "compute-button";
+  button_to_add.classList.add("bigclick");
   let div = document.getElementById('notepad')
+  div.classList.add("center-all")
   div.style.overflow = "hidden"
   div.appendChild(button_to_add);
 }
 
+function initResearchTab() {
+  let div = document.getElementById('research')
+  div.innerHTML = "Research"
+}
+
+function initSettingsTab() {
+  let div = document.getElementById('settings')
+  div.innerHTML = "Settings"
+}
+
 function openTab(tabName) {
+  console.log ("opening tab: " + tabName)
   if (s.activeTab != tabName) {
     old_tab = document.getElementById(s.activeTab)
     old_tab.style.visibility = "hidden"
     old_tab.style.display = "fixed"
     old_tab.classList.remove("flex-vert-filler")
   }
-  let div =document.getElementById(tabName)
+  let div = document.getElementById(tabName)
   div.style.visibility = "visible"
   div.style.display = "flex"
   div.classList.add("flex-vert-filler")
@@ -374,7 +387,8 @@ function initTabPanel() {
     button_to_add.style.visibility = (show) ? "visible" : "hidden";
     button_to_add.style.display = (show) ? "inline" : "none";
     button_to_add.innerHTML = tab;
-    button_to_add.addEventListener("click", function () {document.getElementById(tab).style.visibility = "visible";});
+    let tabName = tab;
+    button_to_add.addEventListener("click", function () {openTab(tabName)});
     button_to_add.id = tab + "-button";
     document.getElementById('tab-panel').appendChild(button_to_add);
   }
@@ -383,16 +397,16 @@ function initTabPanel() {
 function initUi() {
   // notepad
   for (tab of ALL_TABS) {
-  let div_to_add = document.createElement("div");
-  div_to_add.id = tab;
-  // div_to_add.classList.add("flex-vert-filler");
-  div_to_add.classList.add("center-all");
-  document.getElementById("workspace").appendChild(div_to_add);
-  div_to_add.style.visibility = "hidden";
-  div_to_add.style.display = "fixed";
-  div_to_add.style.width = "100%";
+    let div_to_add = document.createElement("div");
+    div_to_add.id = tab;
+    document.getElementById("workspace").appendChild(div_to_add);
+    div_to_add.style.visibility = "hidden";
+    div_to_add.style.display = "fixed";
+    div_to_add.style.width = "100%";
   }
   initNotepadTab();
+  initResearchTab();
+  initSettingsTab();
   initTabPanel();
   openTab(s.activeTab)
 }
@@ -467,7 +481,7 @@ function scribble() {
   padding = 100 * (length * font) / notepad.offsetWidth;
   console.log(padding);
   scrib.style.left = 5 + Math.random() * Math.floor(90-(padding)) + "%";
-  scrib.style.top = 5+ Math.random() * 90+ "%";
+  scrib.style.top = 5+ Math.random() * 90 +  "%";
   scrib.style.transform = "rotate(" + (-15 + (Math.random() * 30)) + "deg)";
   notepad.appendChild(scrib);
   setTimeout(() => {

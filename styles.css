@@ -18,6 +18,12 @@ button {
   z-index: 10;
 }
 
+button.bigclick {
+  min-height: 10mm;
+  min-width: 50mm;
+  margin: 1px;
+}
+
 button.playpause {
   background-color: red;
 }
@@ -69,4 +75,13 @@ p.scribble {
   font-size: 2em;
   position: absolute;
   z-index: 1;
+}
+
+#notepad {
+}
+
+#research {
+}
+
+#settings {
 }
